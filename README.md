@@ -32,7 +32,7 @@ Look at df.info
 # Your code here
 ```
 
-We'll make a first selection of the data by removing some of the data with `dtype = object`, this way our first model only contains **continuous features**
+First, make a selection of the data by removing some of the data with `dtype = object`, this way our first model only contains **continuous features**
 
 Make sure to remove the SalesPrice column from the predictors (which you store in `X`), then replace missing inputs by the median per feature.
 
@@ -91,7 +91,7 @@ Perform the same linear regression on this data and print out R-squared and MSE.
 
 ## Include dummy variables
 
-We haven't included dummy variables so far: let's use our "object" variables again and create dummies
+Your model hasn't included dummy variables so far: let's use the "object" variables again and create dummies
 
 
 ```python
@@ -118,7 +118,7 @@ Perform the same linear regression on this data and print out R-squared and MSE.
 # Your code here
 ```
 
-Notice the severe overfitting above; our training R squared is quite high, but the testing R squared is negative! Our predictions are far far off. Similarly, the scale of the Testing MSE is orders of magnitude higher then that of the training.
+Notice the severe overfitting above; our training R squared is quite high, but the testing R squared is negative! Our predictions are far off. Similarly, the scale of the Testing MSE is orders of magnitude higher than that of the training.
 
 ## Perform Ridge and Lasso regression
 
@@ -156,11 +156,13 @@ With default parameter (alpha = 10)
 # Your code here
 ```
 
-## Look at the metrics, what are your main conclusions?
+## Look at the metrics, what are your main conclusions?   
 
 Conclusions here
 
 ## Compare number of parameter estimates that are (very close to) 0 for Ridge and Lasso
+
+Compare with the total length of the parameter space and draw conclusions!
 
 
 ```python
@@ -172,7 +174,7 @@ Conclusions here
 # number of Lasso params almost zero
 ```
 
-Compare with the total length of the parameter space and draw conclusions!
+Lasso was very effective to essentially perform variable selection and remove about 25% of the variables from your model!
 
 
 ```python
