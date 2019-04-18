@@ -120,7 +120,7 @@ df.info()
     memory usage: 924.0+ KB
 
 
-We'll make a first selection of the data by removing some of the data with `dtype = object`, this way our first model only contains **continuous features**
+First, make a selection of the data by removing some of the data with `dtype = object`, this way our first model only contains **continuous features**
 
 Make sure to remove the SalesPrice column from the predictors (which you store in `X`), then replace missing inputs by the median per feature.
 
@@ -258,7 +258,7 @@ print('Testing MSE:', mean_squared_error(y_test, linreg_norm.predict(X_test)))
 
 ## Include dummy variables
 
-We haven't included dummy variables so far: let's use our "object" variables again and create dummies
+Your model hasn't included dummy variables so far: let's use the "object" variables again and create dummies
 
 
 ```python
@@ -316,7 +316,7 @@ print('Testing MSE:', mean_squared_error(y_test, linreg_all.predict(X_test)))
     Testing MSE: 3.405455332774927e+29
 
 
-Notice the severe overfitting above; our training R squared is quite high, but the testing R squared is negative! Our predictions are far far off. Similarly, the scale of the Testing MSE is orders of magnitude higher then that of the training.
+Notice the severe overfitting above; our training R squared is quite high, but the testing R squared is negative! Our predictions are far off. Similarly, the scale of the Testing MSE is orders of magnitude higher than that of the training.
 
 ## Perform Ridge and Lasso regression
 
@@ -406,7 +406,7 @@ print('Testing MSE:', mean_squared_error(y_test, ridge.predict(X_test)))
     Testing MSE: 1381567084.533856
 
 
-## Look at the metrics, what are your main conclusions?
+## Look at the metrics, what are your main conclusions?   
 
 Conclusions here
 
