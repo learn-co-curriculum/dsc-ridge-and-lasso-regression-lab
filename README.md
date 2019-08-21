@@ -188,7 +188,7 @@ Look at the information of `X` again
 
 ```python
 # __SOLUTION__ 
- X.info()
+X.info()
 ```
 
     <class 'pandas.core.frame.DataFrame'>
@@ -267,10 +267,10 @@ print('Training MSE:', mean_squared_error(y_train, linreg.predict(X_train)))
 print('Testing MSE:', mean_squared_error(y_test, linreg.predict(X_test)))
 ```
 
-    Training r^2: 0.804114659599992
-    Testing r^2: 0.8220293726060767
-    Training MSE: 1187209332.7110069
-    Testing MSE: 1250121037.6196253
+    Training r^2: 0.8030601358929963
+    Testing r^2: 0.8329865147721602
+    Training MSE: 1290704943.3020537
+    Testing MSE: 905366417.2177311
 
 
 ## Normalize your data
@@ -315,10 +315,10 @@ print('Training MSE:', mean_squared_error(y_train, linreg_norm.predict(X_train))
 print('Testing MSE:', mean_squared_error(y_test, linreg_norm.predict(X_test)))
 ```
 
-    Training r^2: 0.8074980907068123
-    Testing r^2: 0.8058185208261739
-    Training MSE: 1150487580.7440414
-    Testing MSE: 1416852598.1566381
+    Training r^2: 0.8055920275109645
+    Testing r^2: 0.8361493699191705
+    Training MSE: 1282264739.3966734
+    Testing MSE: 891277647.3701895
 
 
 ## Include dummy variables
@@ -357,14 +357,14 @@ np.shape(X_cat)
 ```python
 # __SOLUTION__ 
 # Make dummies
-X_cat = pd.get_dummies(X_cat)
+X_cat = pd.get_dummies(X_cat, drop_first=True)
 np.shape(X_cat)
 ```
 
 
 
 
-    (1460, 252)
+    (1460, 209)
 
 
 
@@ -400,10 +400,10 @@ print('Training MSE:', mean_squared_error(y_train, linreg_all.predict(X_train)))
 print('Testing MSE:', mean_squared_error(y_test, linreg_all.predict(X_test)))
 ```
 
-    Training r^2: 0.944755253171197
-    Testing r^2: -4.052906884197962e+19
-    Training MSE: 307167504.32054794
-    Testing MSE: 3.405455332774927e+29
+    Training r^2: 0.9214293703577425
+    Testing r^2: -2.2855415643835795e+17
+    Training MSE: 464036586.48706615
+    Testing MSE: 1.7161965346335193e+27
 
 
 Notice the severe overfitting above; our training R squared is quite high, but the testing R squared is negative! Our predictions are far off. Similarly, the scale of the Testing MSE is orders of magnitude higher than that of the training.
@@ -434,10 +434,10 @@ print('Training MSE:', mean_squared_error(y_train, lasso.predict(X_train)))
 print('Testing MSE:', mean_squared_error(y_test, lasso.predict(X_test)))
 ```
 
-    Training r^2: 0.9451071623243285
-    Testing r^2: 0.8178180225894447
-    Training MSE: 305210846.6739859
-    Testing MSE: 1530784210.5309837
+    Training r^2: 0.9349160654636376
+    Testing r^2: 0.8866420907306873
+    Training MSE: 384384431.6242838
+    Testing MSE: 851196294.5367161
 
 
 With a higher regularization parameter (alpha = 10)
@@ -460,10 +460,10 @@ print('Training MSE:', mean_squared_error(y_train, lasso.predict(X_train)))
 print('Testing MSE:', mean_squared_error(y_test, lasso.predict(X_test)))
 ```
 
-    Training r^2: 0.9438669691644985
-    Testing r^2: 0.8296396546959763
-    Training MSE: 312106471.31972647
-    Testing MSE: 1431452937.3249426
+    Training r^2: 0.9296834563276463
+    Testing r^2: 0.894410839600556
+    Training MSE: 415288117.81010216
+    Testing MSE: 792861324.4067702
 
 
 ## Ridge
@@ -488,10 +488,10 @@ print('Training MSE:', mean_squared_error(y_train, ridge.predict(X_train)))
 print('Testing MSE:', mean_squared_error(y_test, ridge.predict(X_test)))
 ```
 
-    Training r^2: 0.9307909182663064
-    Testing r^2: 0.8360653433796003
-    Training MSE: 384810902.98655874
-    Testing MSE: 1377461083.0345898
+    Training r^2: 0.9111991262476519
+    Testing r^2: 0.8752405838510864
+    Training MSE: 524456206.10053486
+    Testing MSE: 936809380.29851
 
 
 With default parameter (alpha = 10)
@@ -514,10 +514,10 @@ print('Training MSE:', mean_squared_error(y_train, ridge.predict(X_train)))
 print('Testing MSE:', mean_squared_error(y_test, ridge.predict(X_test)))
 ```
 
-    Training r^2: 0.9103367925088878
-    Testing r^2: 0.835576679159496
-    Training MSE: 498538327.2688102
-    Testing MSE: 1381567084.533856
+    Training r^2: 0.8939486068765026
+    Testing r^2: 0.862471549902248
+    Training MSE: 626337432.71873
+    Testing MSE: 1032691127.3431072
 
 
 ## Look at the metrics, what are your main conclusions?   
@@ -532,7 +532,7 @@ Conclusions here
 print(sum(abs(ridge.coef_) < 10**(-10)))
 ```
 
-    11
+    4
 
 
 
@@ -541,7 +541,7 @@ print(sum(abs(ridge.coef_) < 10**(-10)))
 print(sum(abs(lasso.coef_) < 10**(-10)))
 ```
 
-    86
+    39
 
 
 Compare with the total length of the parameter space and draw conclusions!
@@ -572,7 +572,7 @@ len(lasso.coef_)
 
 
 
-    289
+    246
 
 
 
@@ -585,7 +585,7 @@ sum(abs(lasso.coef_) < 10**(-10))/289
 
 
 
-    0.2975778546712803
+    0.13494809688581316
 
 
 
