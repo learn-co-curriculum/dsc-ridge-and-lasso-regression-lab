@@ -182,11 +182,6 @@ Look at the information of `X` again
 
 
 ```python
-
-```
-
-
-```python
 # __SOLUTION__ 
 X.info()
 ```
