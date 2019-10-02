@@ -3,7 +3,7 @@
 
 ## Introduction
 
-In this lab, you'll practice your knowledge on Ridge and Lasso regression!
+In this lab, you'll practice your knowledge of Ridge and Lasso regression!
 
 ## Objectives
 
