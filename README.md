@@ -9,8 +9,8 @@ In this lab, you'll practice your knowledge of Ridge and Lasso regression!
 
 You will be able to:
 
-- Use Lasso and ridge regression in Python
-- Compare Lasso and Ridge with standard regression
+* Use Lasso and ridge regression in Python
+* Compare Lasso and Ridge with standard regression
 
 ## Housing Prices Data
 
@@ -54,6 +54,11 @@ Store the target in `y`.
 ```
 
 Look at the information of `X` again
+
+
+```python
+
+```
 
 ## Let's use this data to perform a first naive linear regression model
 
