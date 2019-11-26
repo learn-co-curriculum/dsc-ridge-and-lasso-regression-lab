@@ -7,28 +7,27 @@ In this lab, you'll practice your knowledge of Ridge and Lasso regression!
 
 ## Objectives
 
-You will be able to:
-* Use Lasso and ridge regression in Python
-* Compare Lasso and Ridge with standard regression
-* Find optimal values of alpha for Lasso and Ridge
+In this lab you will: 
+
+- Use Lasso and Ridge regression with scikit-learn 
+- Compare and contrast Lasso, Ridge and non-regularized regression 
 
 ## Housing Prices Data
 
-Let's look at yet another house pricing data set.
+Let's look at yet another house pricing dataset: 
 
 
 ```python
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-
 import warnings
 warnings.filterwarnings('ignore')
 
 df = pd.read_csv('Housing_Prices/train.csv')
 ```
 
-Look at df.info
+Look at `.info()` of the data: 
 
 
 ```python
@@ -123,64 +122,68 @@ df.info()
     memory usage: 924.0+ KB
 
 
-First, make a selection of the data by removing some of the data with `dtype = object`, this way our first model only contains **continuous features**
-
-Make sure to remove the SalesPrice column from the predictors (which you store in `X`).
-
-Store the target in `y`.
+- First, split the data into `X` (predictor) and `y` (target) variables 
+- Split the data into 75-25 training-test sets. Set the `random_state` to 10 
+- Remove all columns of `object` type from `X_train` and `X_test` and assign them to `X_train_cont` and `X_test_cont`, respectively 
 
 
 ```python
-# Create X and y then split in train and test
-features = [col for col in df.columns if col != 'SalePrice']
-X = df.loc[:, features]
-y = df.loc[:, 'SalePrice']
+# Create X and y
+y = df['SalePrice']
+X = df.drop(columns=['SalePrice'], axis=1)
 
+# Split data into training and test sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=10)
 
-# remove "object"-type features and SalesPrice from `X`
+# Remove "object"-type features from X
 cont_features = [col for col in X.columns if X[col].dtype in [np.float64, np.int64]]
 
+# Remove "object"-type features from X_train and X_test
 X_train_cont = X_train.loc[:, cont_features]
 X_test_cont = X_test.loc[:, cont_features]
 ```
 
-## Let's use this data to perform a first naive linear regression model
+## Let's use this data to build a first naive linear regression model
 
-Compute the R squared and the MSE for both train and test set.
+- Fill the missing values in data using median of the columns (use [`SimpleImputer`](https://scikit-learn.org/stable/modules/generated/sklearn.impute.SimpleImputer.html)) 
+- Fit a linear regression model to this data 
+- Compute the R-squared and the MSE for both the training and test sets 
+
 
 
 ```python
 from sklearn.metrics import mean_squared_error, mean_squared_log_error
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import Imputer
+from sklearn.impute import SimpleImputer
 
-# Impute missing values with median using Imputer from sklearn.preprocessing
-impute = Imputer(strategy='median')
-impute.fit(X_train_cont)
-
-X_train_imputed = impute.transform(X_train_cont)
+# Impute missing values with median using SimpleImputer
+impute = SimpleImputer(strategy='median')
+X_train_imputed = impute.fit_transform(X_train_cont)
 X_test_imputed = impute.transform(X_test_cont)
 
-# Fit the model and print R2 and MSE for train and test
+# Fit the model
 linreg = LinearRegression()
 linreg.fit(X_train_imputed, y_train)
 
+# Print R2 and MSE for training and test sets
 print('Training r^2:', linreg.score(X_train_imputed, y_train))
-print('Testing r^2:', linreg.score(X_test_imputed, y_test))
+print('Test r^2:', linreg.score(X_test_imputed, y_test))
 print('Training MSE:', mean_squared_error(y_train, linreg.predict(X_train_imputed)))
-print('Testing MSE:', mean_squared_error(y_test, linreg.predict(X_test_imputed)))
+print('Test MSE:', mean_squared_error(y_test, linreg.predict(X_test_imputed)))
 ```
 
     Training r^2: 0.8069714678400265
-    Testing r^2: 0.8203264293698926
+    Test r^2: 0.8203264293698926
     Training MSE: 1212415985.7084064
-    Testing MSE: 1146350639.8805728
+    Test MSE: 1146350639.8805728
 
 
 ## Normalize your data
 
-We haven't normalized our data, let's create a new model that uses `StandardScalar` to scale our predictors!
+- Normalize your data using a `StandardScalar`  
+- Fit a linear regression model to this data 
+- Compute the R-squared and the MSE for both the training and test sets 
+
 
 
 ```python
@@ -188,34 +191,33 @@ from sklearn.preprocessing import StandardScaler
 
 # Scale the train and test data
 ss = StandardScaler()
-ss.fit(X_train_imputed)
-
-X_train_imputed_scaled = ss.transform(X_train_imputed)
+X_train_imputed_scaled = ss.fit_transform(X_train_imputed)
 X_test_imputed_scaled = ss.transform(X_test_imputed)
-```
 
-Perform the same linear regression on this data and print out R-squared and MSE.
-
-
-```python
+# Fit the model 
 linreg_norm = LinearRegression()
 linreg_norm.fit(X_train_imputed_scaled, y_train)
 
+# Print R2 and MSE for training and test sets
 print('Training r^2:', linreg_norm.score(X_train_imputed_scaled, y_train))
-print('Testing r^2:', linreg_norm.score(X_test_imputed_scaled, y_test))
+print('Test r^2:', linreg_norm.score(X_test_imputed_scaled, y_test))
 print('Training MSE:', mean_squared_error(y_train, linreg_norm.predict(X_train_imputed_scaled)))
-print('Testing MSE:', mean_squared_error(y_test, linreg_norm.predict(X_test_imputed_scaled)))
+print('Test MSE:', mean_squared_error(y_test, linreg_norm.predict(X_test_imputed_scaled)))
 ```
 
     Training r^2: 0.8070159754195584
-    Testing r^2: 0.8202405055692075
+    Test r^2: 0.8202405055692075
     Training MSE: 1212136432.7308965
-    Testing MSE: 1146898849.6342442
+    Test MSE: 1146898849.6342442
 
 
 ## Include categorical variables
 
-Your model hasn't included categorical variables so far: let's use the "object" variables again
+The above models didn't include categorical variables so far, let's include them! 
+
+
+- Include all columns of `object` type from `X_train` and `X_test` and assign them to `X_train_cat` and `X_test_cat`, respectively 
+- Fill missing values in all these columns with the string `'missing'` 
 
 
 ```python
@@ -224,36 +226,42 @@ features_cat = [col for col in X.columns if X[col].dtype in [np.object]]
 X_train_cat = X_train.loc[:, features_cat]
 X_test_cat = X_test.loc[:, features_cat]
 
-#Fill nans with a value indicating that that it is missing
+# Fill missing values with the string 'missing'
 X_train_cat.fillna(value='missing', inplace=True)
 X_test_cat.fillna(value='missing', inplace=True)
 ```
+
+- One-hot encode all these categorical columns using `OneHotEncoder` 
+- Transform the training and test DataFrames (`X_train_cat`) and (`X_test_cat`) 
+- Run the given code to convert these transformed features into DataFrames 
 
 
 ```python
 from sklearn.preprocessing import OneHotEncoder
 
-# OneHotEncode Categorical variables
+# OneHotEncode categorical variables
 ohe = OneHotEncoder(handle_unknown='ignore')
-ohe.fit(X_train_cat)
 
-X_train_ohe = ohe.transform(X_train_cat)
+# Transform training and test sets
+X_train_ohe = ohe.fit_transform(X_train_cat)
 X_test_ohe = ohe.transform(X_test_cat)
 
+# Convert these columns into a DataFrame 
 columns = ohe.get_feature_names(input_features=X_train_cat.columns)
 cat_train_df = pd.DataFrame(X_train_ohe.todense(), columns=columns)
 cat_test_df = pd.DataFrame(X_test_ohe.todense(), columns=columns)
 ```
 
-Merge `x_cat` together with our scaled `X` so you have one big predictor dataframe.
+- Combine `X_train_imputed_scaled` and `cat_train_df` into a single DataFrame  
+- Similarly, combine `X_test_imputed_scaled` and `cat_test_df` into a single DataFrame 
 
 
 ```python
-X_train_all = pd.concat([pd.DataFrame(X_train_imputed_scaled), cat_train_df], axis = 1)
-X_test_all = pd.concat([pd.DataFrame(X_test_imputed_scaled), cat_test_df], axis = 1)
+X_train_all = pd.concat([pd.DataFrame(X_train_imputed_scaled), cat_train_df], axis=1)
+X_test_all = pd.concat([pd.DataFrame(X_test_imputed_scaled), cat_test_df], axis=1)
 ```
 
-Perform the same linear regression on this data and print out R-squared and MSE.
+Now build a linear regression model using all the features (`X_train_all`). Also, print the R-squared and the MSE for both the training and test sets. 
 
 
 ```python
@@ -261,110 +269,118 @@ linreg_all = LinearRegression()
 linreg_all.fit(X_train_all, y_train)
 
 print('Training r^2:', linreg_all.score(X_train_all, y_train))
-print('Testing r^2:', linreg_all.score(X_test_all, y_test))
+print('Test r^2:', linreg_all.score(X_test_all, y_test))
 print('Training MSE:', mean_squared_error(y_train, linreg_all.predict(X_train_all)))
-print('Testing MSE:', mean_squared_error(y_test, linreg_all.predict(X_test_all)))
+print('Test MSE:', mean_squared_error(y_test, linreg_all.predict(X_test_all)))
 ```
 
-    Training r^2: 0.9360007807588508
-    Testing r^2: -9.0338451960491e+18
-    Training MSE: 401980347.7369863
-    Testing MSE: 5.7637604600137055e+28
+    Training r^2: 0.9359959790142014
+    Test r^2: -3.3802931568930644e+19
+    Training MSE: 402010507.5890411
+    Test MSE: 2.156689606489606e+29
 
 
-Notice the severe overfitting above; our training R squared is quite high, but the testing R squared is negative! Our predictions are far off. Similarly, the scale of the Testing MSE is orders of magnitude higher than that of the training.
+Notice the severe overfitting above; our training R-squared is very high, but the test R-squared is negative! Similarly, the scale of the test MSE is orders of magnitude higher than that of the training MSE.
 
-## Perform Ridge and Lasso regression
+## Ridge and Lasso regression
 
-Use all the data (normalized features and dummy categorical variables) and perform Lasso and Ridge regression for both! Each time, look at R-squared and MSE.
+Use all the data (normalized features and dummy categorical variables, `X_train_all`) to build two models - one each for Lasso and Ridge regression. Each time, look at R-squared and MSE. 
 
 ## Lasso
 
-With default parameter (alpha = 1)
+#### With default parameter (alpha = 1)
 
 
 ```python
 from sklearn.linear_model import Lasso
 
-lasso = Lasso() #Lasso is also known as the L1 norm.
+lasso = Lasso() # Lasso is also known as the L1 norm 
 lasso.fit(X_train_all, y_train)
+
 print('Training r^2:', lasso.score(X_train_all, y_train))
-print('Testing r^2:', lasso.score(X_test_all, y_test))
+print('Test r^2:', lasso.score(X_test_all, y_test))
 print('Training MSE:', mean_squared_error(y_train, lasso.predict(X_train_all)))
-print('Testing MSE:', mean_squared_error(y_test, lasso.predict(X_test_all)))
+print('Test MSE:', mean_squared_error(y_test, lasso.predict(X_test_all)))
 ```
 
     Training r^2: 0.9359681086176651
-    Testing r^2: 0.8886841125942051
-    Training MSE: 402185562.0947691
-    Testing MSE: 710215967.262155
+    Test r^2: 0.8886841125942051
+    Training MSE: 402185562.09476924
+    Test MSE: 710215967.262155
 
 
-With a higher regularization parameter (alpha = 10)
+#### With a higher regularization parameter (alpha = 10)
 
 
 ```python
 
-lasso = Lasso(alpha=10) 
+lasso = Lasso(alpha=10) # Lasso is also known as the L1 norm 
 lasso.fit(X_train_all, y_train)
+
 print('Training r^2:', lasso.score(X_train_all, y_train))
-print('Testing r^2:', lasso.score(X_test_all, y_test))
+print('Test r^2:', lasso.score(X_test_all, y_test))
 print('Training MSE:', mean_squared_error(y_train, lasso.predict(X_train_all)))
-print('Testing MSE:', mean_squared_error(y_test, lasso.predict(X_test_all)))
+print('Test MSE:', mean_squared_error(y_test, lasso.predict(X_test_all)))
 ```
 
     Training r^2: 0.9343826511712741
-    Testing r^2: 0.8966777526569276
-    Training MSE: 412143851.3235961
-    Testing MSE: 659215063.964353
+    Test r^2: 0.8966777526569276
+    Training MSE: 412143851.32359606
+    Test MSE: 659215063.9643528
 
 
 ## Ridge
 
-With default parameter (alpha = 1)
+#### With default parameter (alpha = 1)
 
 
 ```python
 from sklearn.linear_model import Ridge
 
-ridge = Ridge() #Lasso is also known as the L1 norm.
+ridge = Ridge() # Ridge is also known as the L2 norm
 ridge.fit(X_train_all, y_train)
+
 print('Training r^2:', ridge.score(X_train_all, y_train))
-print('Testing r^2:', ridge.score(X_test_all, y_test))
+print('Test r^2:', ridge.score(X_test_all, y_test))
 print('Training MSE:', mean_squared_error(y_train, ridge.predict(X_train_all)))
-print('Testing MSE:', mean_squared_error(y_test, ridge.predict(X_test_all)))
+print('Test MSE:', mean_squared_error(y_test, ridge.predict(X_test_all)))
 ```
 
     Training r^2: 0.9231940244796031
-    Testing r^2: 0.884233048544421
-    Training MSE: 482419834.3987995
-    Testing MSE: 738614579.8334152
+    Test r^2: 0.884233048544421
+    Training MSE: 482419834.3987994
+    Test MSE: 738614579.8334153
 
 
-With default parameter (alpha = 10)
+#### With default parameter (alpha = 10)
 
 
 ```python
 
-ridge = Ridge(alpha = 10) #Lasso is also known as the L1 norm.
+ridge = Ridge(alpha=10) # Ridge is also known as the L2 norm
 ridge.fit(X_train_all, y_train)
+
 print('Training r^2:', ridge.score(X_train_all, y_train))
-print('Testing r^2:', ridge.score(X_test_all, y_test))
+print('Test r^2:', ridge.score(X_test_all, y_test))
 print('Training MSE:', mean_squared_error(y_train, ridge.predict(X_train_all)))
-print('Testing MSE:', mean_squared_error(y_test, ridge.predict(X_test_all)))
+print('Test MSE:', mean_squared_error(y_test, ridge.predict(X_test_all)))
 ```
 
     Training r^2: 0.8990002650425939
-    Testing r^2: 0.8834542222982166
-    Training MSE: 634381310.5991352
-    Testing MSE: 743583635.4522309
+    Test r^2: 0.8834542222982165
+    Training MSE: 634381310.5991349
+    Test MSE: 743583635.4522314
 
 
-## Look at the metrics, what are your main conclusions?   
+## Compare the metrics    
 
-Conclusions here
+Write your conclusions here: 
+_________________________________
+
 
 ## Compare number of parameter estimates that are (very close to) 0 for Ridge and Lasso
+
+Use 10**(-10) as an estimate that is very close to 0. 
 
 
 ```python
@@ -382,65 +398,47 @@ print(sum(abs(lasso.coef_) < 10**(-10)))
     77
 
 
-Compare with the total length of the parameter space and draw conclusions!
-
-Lasso was very effective to essentially perform variable selection and remove about 25% of the variables from your model!
-
 
 ```python
-len(lasso.coef_)
+print(len(lasso.coef_))
+print(sum(abs(lasso.coef_) < 10**(-10))/ len(lasso.coef_))
 ```
-
-
-
 
     296
-
-
-
-
-```python
-sum(abs(lasso.coef_) < 10**(-10))/ len(lasso.coef_)
-```
-
-
-
-
     0.26013513513513514
 
 
+Lasso was very effective to essentially perform variable selection and remove about 25% of the variables from your model!
 
-## Summary
+## Put it all together
 
-To bring all of our work together lets take a moment to put all of our preprocessing steps for categorical and continuous variables into one function. This function should take in our features as a dataframe `X` and target as a Series `y` and return a training and test dataframe with all of our preprocessed features along with training and test targets. 
+To bring all of our work together lets take a moment to put all of our preprocessing steps for categorical and continuous variables into one function. This function should take in our features as a dataframe `X` and target as a Series `y` and return a training and test DataFrames with all of our preprocessed features along with training and test targets. 
 
 
 ```python
 def preprocess(X, y):
     '''Takes in features and target and implements all preprocessing steps for categorical and continuous features returning 
-    train and test dataframes with targets'''
+    train and test DataFrames with targets'''
     
-    #train test split
+    # Train-test split (75-25), set seed to 10
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=10)
     
-    # remove "object"-type features and SalesPrice from `X`
+    # Remove "object"-type features and SalesPrice from X
     cont_features = [col for col in X.columns if X[col].dtype in [np.float64, np.int64]]
 
     X_train_cont = X_train.loc[:, cont_features]
     X_test_cont = X_test.loc[:, cont_features]
 
-    # Impute missing values with median using Imputer from sklearn.preprocessing
-    impute = Imputer(strategy='median')
-    impute.fit(X_train_cont)
+    # Impute missing values with median using SimpleImputer
+    impute = SimpleImputer(strategy='median')
 
-    X_train_imputed = impute.transform(X_train_cont)
+    X_train_imputed = impute.fit_transform(X_train_cont)
     X_test_imputed = impute.transform(X_test_cont)
 
     # Scale the train and test data
     ss = StandardScaler()
-    ss.fit(X_train_imputed)
 
-    X_train_imputed_scaled = ss.transform(X_train_imputed)
+    X_train_imputed_scaled = ss.fit_transform(X_train_imputed)
     X_test_imputed_scaled = ss.transform(X_test_imputed)
 
     # Create X_cat which contains only the categorical variables
@@ -448,33 +446,82 @@ def preprocess(X, y):
     X_train_cat = X_train.loc[:, features_cat]
     X_test_cat = X_test.loc[:, features_cat]
 
-    #Fill nans with a value indicating that that it is missing
+    # Fill nans with a value indicating that that it is missing
     X_train_cat.fillna(value='missing', inplace=True)
     X_test_cat.fillna(value='missing', inplace=True)
 
     # OneHotEncode Categorical variables
     ohe = OneHotEncoder(handle_unknown='ignore')
-    ohe.fit(X_train_cat)
 
-    X_train_ohe = ohe.transform(X_train_cat)
+    X_train_ohe = ohe.fit_transform(X_train_cat)
     X_test_ohe = ohe.transform(X_test_cat)
 
     columns = ohe.get_feature_names(input_features=X_train_cat.columns)
     cat_train_df = pd.DataFrame(X_train_ohe.todense(), columns=columns)
     cat_test_df = pd.DataFrame(X_test_ohe.todense(), columns=columns)
     
-    # combine categorical and continuous features into the final dataframe
-    X_train_all = pd.concat([pd.DataFrame(X_train_imputed_scaled), cat_train_df], axis = 1)
-    X_test_all = pd.concat([pd.DataFrame(X_test_imputed_scaled), cat_test_df], axis = 1)
+    # Combine categorical and continuous features into the final dataframe
+    X_train_all = pd.concat([pd.DataFrame(X_train_imputed_scaled), cat_train_df], axis=1)
+    X_test_all = pd.concat([pd.DataFrame(X_test_imputed_scaled), cat_test_df], axis=1)
     
     return X_train_all, X_test_all, y_train, y_test
 ```
 
-### Graph the Training and Test Error to Find Optimal Alpha Values
+### Graph the training and test error to find optimal alpha values
 
-Earlier we tested several values of alpha to see how it effected our MSE and the value of our coefficients. We could continue to guess values of alpha for our Ridge or Lasso regression one at a time to see which values minimize our loss, or we can test a range of values and pick the alpha which minimizes our MSE. Here is an example of how we would 
+Earlier we tested two values of alpha to see how it effected our MSE and the value of our coefficients. We could continue to guess values of alpha for our Ridge or Lasso regression one at a time to see which values minimize our loss, or we can test a range of values and pick the alpha which minimizes our MSE. Here is an example of how we would do this:  
 
-Take a look at this graph of our training and testing MSE against alpha. Try to explain to yourself why the shapes of the training and test curves are this way. Make sure to think about what alpha represents and how it relates to overfitting vs underfitting.
 
-## Level Up
-If you would like more practice doing this kind of analysis try to find the optimal value of alpha for a Ridge regression.
+```python
+X_train_all, X_test_all, y_train, y_test = preprocess(X, y)
+
+train_mse = []
+test_mse = []
+alphas = []
+
+for alpha in np.linspace(0, 200, num=50):
+    lasso = Lasso(alpha=alpha)
+    lasso.fit(X_train_all, y_train)
+    
+    train_preds = lasso.predict(X_train_all)
+    train_mse.append(mean_squared_error(y_train, train_preds))
+    
+    test_preds = lasso.predict(X_test_all)
+    test_mse.append(mean_squared_error(y_test, test_preds))
+    
+    alphas.append(alpha)
+```
+
+
+```python
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+fig, ax = plt.subplots()
+ax.plot(alphas, train_mse, label='Train')
+ax.plot(alphas, test_mse, label='Test')
+ax.set_xlabel('Alpha')
+ax.set_ylabel('MSE')
+
+# np.argmin() returns the index of the minimum value in a list
+optimal_alpha = alphas[np.argmin(test_mse)]
+
+# Add a vertical line where the test MSE is minimized
+ax.axvline(optimal_alpha, color='black', linestyle='--')
+ax.legend();
+
+print(f'Optimal Alpha Value: {int(optimal_alpha)}')
+```
+
+    Optimal Alpha Value: 40
+
+
+
+![png](index_files/index_51_1.png)
+
+
+Take a look at this graph of our training and test MSE against alpha. Try to explain to yourself why the shapes of the training and test curves are this way. Make sure to think about what alpha represents and how it relates to overfitting vs underfitting.
+
+## Summary
+
+Well done! You now know how to build Lasso and Ridge regression models, use them for feature selection and find an optimal value for $\text{alpha}$. 
