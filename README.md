@@ -1,183 +1,127 @@
-
 # Ridge and Lasso Regression - Lab
 
 ## Introduction
 
-In this lab, you'll practice your knowledge of Ridge and Lasso regression!
+In this lab, you'll practice your knowledge of ridge and lasso regression!
 
 ## Objectives
 
 In this lab you will: 
 
-- Use Lasso and Ridge regression with scikit-learn 
-- Compare and contrast Lasso, Ridge and non-regularized regression 
+- Use lasso and ridge regression with scikit-learn 
+- Compare and contrast lasso, ridge and non-regularized regression 
 
 ## Housing Prices Data
 
-Let's look at yet another house pricing dataset: 
+We'll use this version of the Ames Housing dataset: 
 
 
 ```python
+# Run this cell without changes
 import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
 import warnings
 warnings.filterwarnings('ignore')
-
-df = pd.read_csv('Housing_Prices/train.csv')
+df = pd.read_csv('housing_prices.csv', index_col=0)
+df.info()
 ```
 
-Look at `.info()` of the data: 
+More information about the features is available in the `data_description.txt` file in this repository.
+
+## Data Preparation
+
+The code below:
+
+* Separates the data into `X` (predictor) and `y` (target) variables
+* Splits the data into 75-25 training-test sets, with a `random_state` of 10
+* Separates each of the `X` values into continuous vs. categorical features
+* Fills in missing values (using different strategies for continuous vs. categorical features)
+* Scales continuous features to a range of 0 to 1
+* Dummy encodes categorical features
+* Combines the preprocessed continuous and categorical features back together
 
 
 ```python
-# Your code here
-```
+# Run this cell without changes
+import numpy as np
+from sklearn.impute import SimpleImputer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 
-- First, split the data into `X` (predictor) and `y` (target) variables 
-- Split the data into 75-25 training-test sets. Set the `random_state` to 10 
-- Remove all columns of `object` type from `X_train` and `X_test` and assign them to `X_train_cont` and `X_test_cont`, respectively 
-
-
-```python
 # Create X and y
-y = None
-X = None
+y = df['SalePrice']
+X = df.drop(columns=['SalePrice'])
 
 # Split data into training and test sets
-X_train, X_test, y_train, y_test = None
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=10)
 
-# Remove "object"-type features from X
-cont_features = None
+# Separate X data into continuous vs. categorical
+X_train_cont = X_train.select_dtypes(include='number')
+X_test_cont = X_test.select_dtypes(include='number')
+X_train_cat = X_train.select_dtypes(exclude='number')
+X_test_cat = X_test.select_dtypes(exclude='number')
 
-# Remove "object"-type features from X_train and X_test
-X_train_cont = None
-X_test_cont = None
+# Impute missing values using SimpleImputer, median for continuous and
+# filling in 'missing' for categorical
+impute_cont = SimpleImputer(strategy='median')
+X_train_cont = impute_cont.fit_transform(X_train_cont)
+X_test_cont = impute_cont.transform(X_test_cont)
+impute_cat = SimpleImputer(strategy='constant', fill_value='missing')
+X_train_cat = impute_cat.fit_transform(X_train_cat)
+X_test_cat = impute_cat.transform(X_test_cat)
+
+# Scale continuous values using MinMaxScaler
+scaler = MinMaxScaler()
+X_train_cont = scaler.fit_transform(X_train_cont)
+X_test_cont = scaler.transform(X_test_cont)
+
+# Dummy encode categorical values using OneHotEncoder
+ohe = OneHotEncoder(handle_unknown='ignore')
+X_train_cat = ohe.fit_transform(X_train_cat)
+X_test_cat = ohe.transform(X_test_cat)
+
+# Combine everything back together
+X_train_preprocessed = np.concatenate([X_train_cont, X_train_cat.todense()], axis=1)
+X_test_preprocessed = np.concatenate([X_test_cont, X_test_cat.todense()], axis=1)
 ```
 
-## Let's use this data to build a first naive linear regression model
+## Linear Regression Model
 
-- Fill the missing values in data using median of the columns (use [`SimpleImputer`](https://scikit-learn.org/stable/modules/generated/sklearn.impute.SimpleImputer.html)) 
-- Fit a linear regression model to this data 
-- Compute the R-squared and the MSE for both the training and test sets 
-
+Let's use this data to build a first naive linear regression model. Fit the model on the training data (`X_train_preprocessed`), then compute the R-Squared and the MSE for both the training and test sets.
 
 
 ```python
-from sklearn.metrics import mean_squared_error, mean_squared_log_error
+# Replace None with appropriate code
+from sklearn.metrics import mean_squared_error
 from sklearn.linear_model import LinearRegression
-from sklearn.impute import SimpleImputer
 
-# Impute missing values with median using SimpleImputer
-impute = None
-X_train_imputed = None
-X_test_imputed = None
-
-# Fit the model and print R2 and MSE for training and test sets
+# Fit the model
 linreg = None
 
 # Print R2 and MSE for training and test sets
-
+None
 ```
 
-## Normalize your data
+Notice the severe overfitting above; our training R-Squared is very high, but the test R-Squared is negative! Similarly, the scale of the test MSE is orders of magnitude higher than that of the training MSE.
 
-- Normalize your data using a `StandardScalar`  
-- Fit a linear regression model to this data 
-- Compute the R-squared and the MSE for both the training and test sets 
+## Ridge and Lasso Regression
 
+Use all the data (scaled features and dummy categorical variables, `X_train_preprocessed`) to build some models with regularization - two each for lasso and ridge regression. Each time, look at R-Squared and MSE.
 
+Remember that you can use the scikit-learn documentation if you don't remember how to import or use these classes:
 
-```python
-from sklearn.preprocessing import StandardScaler
+* [`Lasso` documentation](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html)
+* [`Ridge` documentation](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html)
 
-# Scale the train and test data
-ss = None
-X_train_imputed_scaled = None
-X_test_imputed_scaled = None
+### Lasso
 
-# Fit the model
-linreg_norm = None
-
-
-# Print R2 and MSE for training and test sets
-
-```
-
-## Include categorical variables
-
-The above models didn't include categorical variables so far, let's include them! 
-
-
-- Include all columns of `object` type from `X_train` and `X_test` and assign them to `X_train_cat` and `X_test_cat`, respectively 
-- Fill missing values in all these columns with the string `'missing'` 
-
-
-```python
-# Create X_cat which contains only the categorical variables
-features_cat = None
-X_train_cat = None
-X_test_cat = None
-
-# Fill missing values with the string 'missing'
-
-
-```
-
-- One-hot encode all these categorical columns using `OneHotEncoder` 
-- Transform the training and test DataFrames (`X_train_cat`) and (`X_test_cat`) 
-- Run the given code to convert these transformed features into DataFrames 
-
-
-```python
-from sklearn.preprocessing import OneHotEncoder
-
-# OneHotEncode categorical variables
-ohe = None
-
-# Transform training and test sets
-X_train_ohe = None
-X_test_ohe = None
-
-# Convert these columns into a DataFrame
-columns = ohe.get_feature_names(input_features=X_train_cat.columns)
-cat_train_df = pd.DataFrame(X_train_ohe.todense(), columns=columns)
-cat_test_df = pd.DataFrame(X_test_ohe.todense(), columns=columns)
-```
-
-- Combine `X_train_imputed_scaled` and `cat_train_df` into a single DataFrame  
-- Similarly, combine `X_test_imputed_scaled` and `cat_test_df` into a single DataFrame 
-
-
-```python
-# Your code here
-X_train_all = None
-X_test_all = None
-```
-
-Now build a linear regression model using all the features (`X_train_all`). Also, print the R-squared and the MSE for both the training and test sets. 
+#### With default hyperparameters (`alpha` = 1)
 
 
 ```python
 # Your code here
 ```
 
-Notice the severe overfitting above; our training R-squared is very high, but the test R-squared is negative! Similarly, the scale of the test MSE is orders of magnitude higher than that of the training MSE.
-
-## Ridge and Lasso regression
-
-Use all the data (normalized features and dummy categorical variables, `X_train_all`) to build two models - one each for Lasso and Ridge regression. Each time, look at R-squared and MSE. 
-
-## Lasso
-
-#### With default parameter (alpha = 1)
-
-
-```python
-# Your code here
-```
-
-#### With a higher regularization parameter (alpha = 10)
+#### With a higher regularization hyperparameter (`alpha` = 10)
 
 
 ```python
@@ -186,118 +130,98 @@ Use all the data (normalized features and dummy categorical variables, `X_train_
 
 ## Ridge
 
-#### With default parameter (alpha = 1)
+#### With default hyperparameters (`alpha` = 1)
 
 
 ```python
 # Your code here
 ```
 
-#### With default parameter (alpha = 10)
+#### With higher regularization hyperparameter (`alpha` = 10)
 
 
 ```python
 # Your code here
 ```
 
-## Compare the metrics    
+## Comparing the Metrics    
 
-Write your conclusions here: 
-_________________________________
+Which model seems best, based on the metrics?
 
 
-## Compare number of parameter estimates that are (very close to) 0 for Ridge and Lasso
+```python
+# Write your conclusions here:
+
+```
+
+<details>
+    <summary style="cursor: pointer"><b>Answer (click to reveal)</b></summary>
+
+In terms of both R-Squared and MSE, the `Lasso` model with `alpha`=10 has the best metric results.
+
+(Remember that better R-Squared is higher, whereas better MSE is lower.)
+
+</details>
+
+## Comparing the Parameters
+
+Compare the number of parameter estimates that are (very close to) 0 for the `Ridge` and `Lasso` models with `alpha`=10.
 
 Use 10**(-10) as an estimate that is very close to 0. 
 
 
 ```python
 # Number of Ridge params almost zero
+
 ```
 
 
 ```python
 # Number of Lasso params almost zero
+
 ```
 
 
 ```python
-print(len(lasso.coef_))
-print(sum(abs(lasso.coef_) < 10**(-10))/ len(lasso.coef_))
+# Compare and interpret these results
+
 ```
 
-Lasso was very effective to essentially perform variable selection and remove about 25% of the variables from your model!
+<details>
+    <summary style="cursor: pointer"><b>Answer (click to reveal)</b></summary>
 
-## Put it all together
+The ridge model did not penalize any coefficients to 0, while the lasso model removed about 1/4 of the coefficients. The lasso model essentially performed variable selection for us, and got the best metrics as a result!
 
-To bring all of our work together lets take a moment to put all of our preprocessing steps for categorical and continuous variables into one function. This function should take in our features as a dataframe `X` and target as a Series `y` and return a training and test DataFrames with all of our preprocessed features along with training and test targets. 
+</details>
+
+## Finding an Optimal Alpha
+
+Earlier we tested two values of `alpha` to see how it effected our MSE and the value of our coefficients. We could continue to guess values of `alpha` for our ridge or lasso regression one at a time to see which values minimize our loss, or we can test a range of values and pick the alpha which minimizes our MSE. Here is an example of how we would do this:  
 
 
 ```python
-def preprocess(X, y):
-    '''Takes in features and target and implements all preprocessing steps for categorical and continuous features returning 
-    train and test DataFrames with targets'''
-    
-    # Train-test split (75-25), set seed to 10
-
-    
-    # Remove "object"-type features and SalesPrice from X
-
-
-    # Impute missing values with median using SimpleImputer
-
-
-    # Scale the train and test data
-
-
-    # Create X_cat which contains only the categorical variables
-
-
-    # Fill nans with a value indicating that that it is missing
-
-
-    # OneHotEncode Categorical variables
-
-    
-    # Combine categorical and continuous features into the final dataframe
-    
-    return X_train_all, X_test_all, y_train, y_test
-```
-
-### Graph the training and test error to find optimal alpha values
-
-Earlier we tested two values of alpha to see how it effected our MSE and the value of our coefficients. We could continue to guess values of alpha for our Ridge or Lasso regression one at a time to see which values minimize our loss, or we can test a range of values and pick the alpha which minimizes our MSE. Here is an example of how we would do this:  
-
-
-```python
-X_train_all, X_test_all, y_train, y_test = preprocess(X, y)
+# Run this cell without changes
+import matplotlib.pyplot as plt
+%matplotlib inline
 
 train_mse = []
 test_mse = []
-alphas = []
+alphas = np.linspace(0, 200, num=50)
 
-for alpha in np.linspace(0, 200, num=50):
+for alpha in alphas:
     lasso = Lasso(alpha=alpha)
-    lasso.fit(X_train_all, y_train)
+    lasso.fit(X_train_preprocessed, y_train)
     
-    train_preds = lasso.predict(X_train_all)
+    train_preds = lasso.predict(X_train_preprocessed)
     train_mse.append(mean_squared_error(y_train, train_preds))
     
-    test_preds = lasso.predict(X_test_all)
+    test_preds = lasso.predict(X_test_preprocessed)
     test_mse.append(mean_squared_error(y_test, test_preds))
-    
-    alphas.append(alpha)
-```
-
-
-```python
-import matplotlib.pyplot as plt
-%matplotlib inline
 
 fig, ax = plt.subplots()
 ax.plot(alphas, train_mse, label='Train')
 ax.plot(alphas, test_mse, label='Test')
-ax.set_xlabel('Alpha')
+ax.set_xlabel('alpha')
 ax.set_ylabel('MSE')
 
 # np.argmin() returns the index of the minimum value in a list
@@ -310,8 +234,19 @@ ax.legend();
 print(f'Optimal Alpha Value: {int(optimal_alpha)}')
 ```
 
-Take a look at this graph of our training and test MSE against alpha. Try to explain to yourself why the shapes of the training and test curves are this way. Make sure to think about what alpha represents and how it relates to overfitting vs underfitting.
+Take a look at this graph of our training and test MSE against `alpha`. Try to explain to yourself why the shapes of the training and test curves are this way. Make sure to think about what `alpha` represents and how it relates to overfitting vs underfitting.
+
+---
+
+<details>
+    <summary style="cursor: pointer"><b>Answer (click to reveal)</b></summary>
+
+For `alpha` values below 28, the model is overfitting. As `alpha` increases up to 28, the MSE for the training data increases and MSE for the test data decreases, indicating that we are reducing overfitting.
+
+For `alpha` values above 28, the model is starting to underfit. You can tell because _both_ the train and the test MSE is increasing.
+
+</details>
 
 ## Summary
 
-Well done! You now know how to build Lasso and Ridge regression models, use them for feature selection and find an optimal value for $\text{alpha}$. 
+Well done! You now know how to build lasso and ridge regression models, use them for feature selection and find an optimal value for `alpha`. 
