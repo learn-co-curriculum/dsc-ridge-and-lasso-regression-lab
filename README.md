@@ -372,7 +372,7 @@ The ridge model did not penalize any coefficients to 0, while the lasso model re
 
 ## Finding an Optimal Alpha
 
-Earlier we tested two values of `alpha` to see how it effected our MSE and the value of our coefficients. We could continue to guess values of `alpha` for our ridge or lasso regression one at a time to see which values minimize our loss, or we can test a range of values and pick the alpha which minimizes our MSE. Here is an example of how we would do this:  
+Earlier we tested two values of `alpha` to see how it affected our MSE and the value of our coefficients. We could continue to guess values of `alpha` for our ridge or lasso regression one at a time to see which values minimize our loss, or we can test a range of values and pick the alpha which minimizes our MSE. Here is an example of how we would do this:  
 
 
 ```python
@@ -427,7 +427,7 @@ Take a look at this graph of our training and test MSE against `alpha`. Try to e
 
 For `alpha` values below 28, the model is overfitting. As `alpha` increases up to 28, the MSE for the training data increases and MSE for the test data decreases, indicating that we are reducing overfitting.
 
-For `alpha` values above 28, the model is starting to underfit. You can tell because _both_ the train and the test MSE is increasing.
+For `alpha` values above 28, the model is starting to underfit. You can tell because _both_ the train and the test MSE values are increasing.
 
 </details>
 
