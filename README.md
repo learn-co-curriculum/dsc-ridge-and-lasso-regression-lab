@@ -36,7 +36,7 @@ df.info()
 ```
 
     <class 'pandas.core.frame.DataFrame'>
-    Int64Index: 1460 entries, 1 to 1460
+    Index: 1460 entries, 1 to 1460
     Data columns (total 80 columns):
      #   Column         Non-Null Count  Dtype  
     ---  ------         --------------  -----  
@@ -64,7 +64,7 @@ df.info()
      21  RoofMatl       1460 non-null   object 
      22  Exterior1st    1460 non-null   object 
      23  Exterior2nd    1460 non-null   object 
-     24  MasVnrType     1452 non-null   object 
+     24  MasVnrType     588 non-null    object 
      25  MasVnrArea     1452 non-null   float64
      26  ExterQual      1460 non-null   object 
      27  ExterCond      1460 non-null   object 
@@ -179,8 +179,8 @@ X_train_cat = ohe.fit_transform(X_train_cat)
 X_test_cat = ohe.transform(X_test_cat)
 
 # Combine everything back together
-X_train_preprocessed = np.concatenate([X_train_cont, X_train_cat.todense()], axis=1)
-X_test_preprocessed = np.concatenate([X_test_cont, X_test_cat.todense()], axis=1)
+X_train_preprocessed = np.asarray(np.concatenate([X_train_cont, X_train_cat.todense()], axis=1))
+X_test_preprocessed = np.asarray(np.concatenate([X_test_cont, X_test_cat.todense()], axis=1))
 ```
 
 
@@ -224,8 +224,8 @@ X_train_cat = ohe.fit_transform(X_train_cat)
 X_test_cat = ohe.transform(X_test_cat)
 
 # Combine everything back together
-X_train_preprocessed = np.concatenate([X_train_cont, X_train_cat.todense()], axis=1)
-X_test_preprocessed = np.concatenate([X_test_cont, X_test_cat.todense()], axis=1)
+X_train_preprocessed = np.asarray(np.concatenate([X_train_cont, X_train_cat.todense()], axis=1))
+X_test_preprocessed = np.asarray(np.concatenate([X_test_cont, X_test_cat.todense()], axis=1))
 ```
 
 ## Linear Regression Model
@@ -262,10 +262,10 @@ print('Training MSE:', mean_squared_error(y_train, linreg.predict(X_train_prepro
 print('Test MSE:    ', mean_squared_error(y_test, linreg.predict(X_test_preprocessed)))
 ```
 
-    Training r^2: 0.935894474732577
-    Test r^2:     -2.51677622190316e+19
-    Training MSE: 402648057.96712327
-    Test MSE:     1.6057498174589344e+29
+    Training r^2: 0.9358295046768584
+    Test r^2:     -1.9852963138198408e+18
+    Training MSE: 403056136.1577625
+    Test MSE:     1.2666557979109703e+28
 
 
 Notice the severe overfitting above; our training R-Squared is very high, but the test R-Squared is negative! Similarly, the scale of the test MSE is orders of magnitude higher than that of the training MSE.
@@ -302,10 +302,10 @@ print('Training MSE:', mean_squared_error(y_train, lasso.predict(X_train_preproc
 print('Test MSE:    ', mean_squared_error(y_test, lasso.predict(X_test_preprocessed)))
 ```
 
-    Training r^2: 0.9358329893282811
-    Test r^2:     0.8894619546974663
-    Training MSE: 403034248.99402535
-    Test MSE:     705253190.6574916
+    Training r^2: 0.9357678834535463
+    Test r^2:     0.8896008328382145
+    Training MSE: 403443180.2665612
+    Test MSE:     704367122.4118733
 
 
 #### With a higher regularization hyperparameter (`alpha` = 10)
@@ -328,10 +328,10 @@ print('Training MSE:', mean_squared_error(y_train, lasso_10.predict(X_train_prep
 print('Test MSE:    ', mean_squared_error(y_test, lasso_10.predict(X_test_preprocessed)))
 ```
 
-    Training r^2: 0.9340791643883491
-    Test r^2:     0.8980800909835147
-    Training MSE: 414050057.7426786
-    Test MSE:     650267885.8547701
+    Training r^2: 0.9340227309628953
+    Test r^2:     0.8980974278412501
+    Training MSE: 414404517.19166696
+    Test MSE:     650157273.4932035
 
 
 ## Ridge
@@ -357,10 +357,10 @@ print('Training MSE:', mean_squared_error(y_train, ridge.predict(X_train_preproc
 print('Test MSE:    ', mean_squared_error(y_test, ridge.predict(X_test_preprocessed)))
 ```
 
-    Training r^2: 0.920803998083458
-    Test r^2:     0.8863596364585585
-    Training MSE: 497431636.93662256
-    Test MSE:     725046555.2898804
+    Training r^2: 0.920774565101128
+    Test r^2:     0.8864445930581225
+    Training MSE: 497616506.07428116
+    Test MSE:     724504516.4584
 
 
 #### With higher regularization hyperparameter (`alpha` = 10)
@@ -383,10 +383,10 @@ print('Training MSE:', mean_squared_error(y_train, ridge_10.predict(X_train_prep
 print('Test MSE:    ', mean_squared_error(y_test, ridge_10.predict(X_test_preprocessed)))
 ```
 
-    Training r^2: 0.8889512334535105
-    Test r^2:     0.8794931799899866
-    Training MSE: 697499474.547024
-    Test MSE:     768855818.604763
+    Training r^2: 0.8889479144938476
+    Test r^2:     0.879515956494524
+    Training MSE: 697520320.9975778
+    Test MSE:     768710500.2896702
 
 
 ## Comparing the Metrics    
@@ -418,18 +418,18 @@ print('Ridge, alpha=10:  ', mean_squared_error(y_test, ridge_10.predict(X_test_p
 ```
 
     Test r^2
-    Linear Regression: -2.51677622190316e+19
-    Lasso, alpha=1:    0.8894619546974663
-    Lasso, alpha=10:   0.8980800909835147
-    Ridge, alpha=1:    0.8863596364585585
-    Ridge, alpha=10:   0.8794931799899866
+    Linear Regression: -1.9852963138198408e+18
+    Lasso, alpha=1:    0.8896008328382145
+    Lasso, alpha=10:   0.8980974278412501
+    Ridge, alpha=1:    0.8864445930581225
+    Ridge, alpha=10:   0.879515956494524
     
     Test MSE
-    Linear Regression: 1.6057498174589344e+29
-    Lasso, alpha=1:    705253190.6574916
-    Lasso, alpha=10:   650267885.8547701
-    Ridge, alpha=1:    725046555.2898804
-    Ridge, alpha=10:   768855818.604763
+    Linear Regression: 1.2666557979109703e+28
+    Lasso, alpha=1:    704367122.4118733
+    Lasso, alpha=10:   650157273.4932035
+    Ridge, alpha=1:    724504516.4584
+    Ridge, alpha=10:   768710500.2896702
 
 
 <details>
@@ -460,7 +460,7 @@ print('Zeroed-out ridge params:', sum(abs(ridge_10.coef_) < 10**(-10)),
      'out of', len(ridge_10.coef_))
 ```
 
-    Zeroed-out ridge params: 0 out of 295
+    Zeroed-out ridge params: 0 out of 294
 
 
 
@@ -476,7 +476,7 @@ print('Zeroed-out lasso params:', sum(abs(lasso_10.coef_) < 10**(-10)),
      'out of', len(lasso_10.coef_))
 ```
 
-    Zeroed-out lasso params: 82 out of 295
+    Zeroed-out lasso params: 81 out of 294
 
 
 
