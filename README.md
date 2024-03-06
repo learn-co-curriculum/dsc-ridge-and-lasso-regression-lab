@@ -80,8 +80,8 @@ X_train_cat = ohe.fit_transform(X_train_cat)
 X_test_cat = ohe.transform(X_test_cat)
 
 # Combine everything back together
-X_train_preprocessed = np.concatenate([X_train_cont, X_train_cat.todense()], axis=1)
-X_test_preprocessed = np.concatenate([X_test_cont, X_test_cat.todense()], axis=1)
+X_train_preprocessed = np.asarray(np.concatenate([X_train_cont, X_train_cat.todense()], axis=1))
+X_test_preprocessed = np.asarray(np.concatenate([X_test_cont, X_test_cat.todense()], axis=1))
 ```
 
 ## Linear Regression Model
